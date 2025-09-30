@@ -3,6 +3,10 @@ package com.example.tp4
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+// AJOUT : Imports nécessaires pour les animations
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+// Fin des ajouts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
@@ -33,7 +37,16 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "main") {
+                // C'est ICI que les animations sont ajoutées
+                NavHost(
+                    navController = navController,
+                    startDestination = "main",
+                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                    exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+                    popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+                ) {
+                    // Le reste du code ne change pas
                     composable("main") {
                         MainScreen(
                             onInitializeClick = viewModel::initializeDatabase,
@@ -44,7 +57,6 @@ class MainActivity : ComponentActivity() {
                             onAddContactClick = {
                                 navController.navigate("add_contact")
                             },
-                            // Quand on clique sur "Modifier", on va aussi à la liste
                             onModifyContactClick = {
                                 viewModel.loadContacts()
                                 navController.navigate("contact_list")
@@ -52,19 +64,15 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // MODIFICATION : On rend la liste cliquable
                     composable("contact_list") {
                         ContactListScreen(
                             contacts = contactsState,
                             onContactClick = { contact ->
-                                // Au clic, on navigue vers l'écran d'édition
-                                // en passant l'ID du contact dans la route
                                 navController.navigate("edit_contact/${contact.id}")
                             }
                         )
                     }
 
-                    // AJOUT : La nouvelle route pour l'écran de modification
                     composable(
                         route = "edit_contact/{contactId}",
                         arguments = listOf(navArgument("contactId") { type = NavType.IntType })
@@ -77,7 +85,7 @@ class MainActivity : ComponentActivity() {
                                 contact = contactToEdit,
                                 onUpdateContact = { updatedContact ->
                                     viewModel.updateContact(updatedContact)
-                                    navController.popBackStack() // Revenir en arrière
+                                    navController.popBackStack()
                                 }
                             )
                         }
