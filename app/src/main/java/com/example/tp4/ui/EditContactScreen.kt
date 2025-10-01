@@ -18,7 +18,8 @@ import com.example.tp4.data.Contact
 fun EditContactScreen(
     contact: Contact,
     onUpdateContact: (Contact) -> Unit,
-    onNavigateUp: () -> Unit // Pour gérer le clic sur la flèche de retour
+    onNavigateUp: () -> Unit, // Pour gérer le clic sur la flèche de retour
+    onDeleteContact: () -> Unit
 ) {
     var nom by remember { mutableStateOf(contact.nom) }
     var telephone by remember { mutableStateOf(contact.numTelephone) }
@@ -107,6 +108,14 @@ fun EditContactScreen(
             ) {
                 Text("Modifier ce contact")
             }
+            // --- AJOUT : Le bouton pour supprimer ---
+            TextButton(
+                onClick = onDeleteContact,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Supprimer le contact", color = MaterialTheme.colorScheme.error)
+            }
+
         }
     }
 }

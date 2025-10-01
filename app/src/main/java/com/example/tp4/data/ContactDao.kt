@@ -2,6 +2,7 @@
 package com.example.tp4.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -25,6 +26,9 @@ interface ContactDao {
     // Une requête pour vider toute la table.
     @Query("DELETE FROM contacts")
     suspend fun deleteAllContacts()
+
+    @Delete
+    suspend fun deleteContact(contact: Contact)
 
     @Update
     suspend fun updateContact(contact: Contact)

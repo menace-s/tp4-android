@@ -67,4 +67,11 @@ class MainViewModel(private val dao: ContactDao) : ViewModel() {
             loadContacts()
         }
     }
+    fun deleteContact(contact: Contact) {
+        viewModelScope.launch {
+            dao.deleteContact(contact)
+            // On recharge la liste pour que la suppression soit visible
+            loadContacts()
+        }
+    }
 }

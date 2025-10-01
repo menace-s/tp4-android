@@ -92,6 +92,10 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onNavigateUp = {
                                     navController.navigateUp()
+                                },
+                                onDeleteContact = {
+                                    viewModel.deleteContact(contactToEdit)
+                                    navController.popBackStack() // Revenir à la liste
                                 }
                             )
                         }
