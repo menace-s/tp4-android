@@ -69,6 +69,9 @@ class MainActivity : ComponentActivity() {
                             contacts = contactsState,
                             onContactClick = { contact ->
                                 navController.navigate("edit_contact/${contact.id}")
+                            },
+                            onAddContactClick = {
+                                navController.navigate("add_contact")
                             }
                         )
                     }
@@ -86,6 +89,9 @@ class MainActivity : ComponentActivity() {
                                 onUpdateContact = { updatedContact ->
                                     viewModel.updateContact(updatedContact)
                                     navController.popBackStack()
+                                },
+                                onNavigateUp = {
+                                    navController.navigateUp()
                                 }
                             )
                         }
@@ -96,6 +102,9 @@ class MainActivity : ComponentActivity() {
                             onAddContact = { nom, telephone ->
                                 viewModel.addContact(nom, telephone)
                                 navController.popBackStack()
+                            },
+                            onNavigateUp = {
+                                navController.navigateUp() // Autre façon de revenir en arrière
                             }
                         )
                     }

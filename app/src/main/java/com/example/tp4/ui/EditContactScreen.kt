@@ -1,78 +1,112 @@
 package com.example.tp4.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.tp4.data.Contact
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditContactScreen(
     contact: Contact,
-    onUpdateContact: (Contact) -> Unit
+    onUpdateContact: (Contact) -> Unit,
+    onNavigateUp: () -> Unit // Pour gérer le clic sur la flèche de retour
 ) {
     var nom by remember { mutableStateOf(contact.nom) }
     var telephone by remember { mutableStateOf(contact.numTelephone) }
-
-    // --- AJOUT : On crée des états pour suivre les erreurs ---
     var isNomError by remember { mutableStateOf(false) }
     var isTelephoneError by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        OutlinedTextField(
-            value = nom,
-            onValueChange = {
-                nom = it
-                isNomError = false // On enlève l'erreur dès que l'utilisateur tape
-            },
-            label = { Text("Nom") },
-            // --- AJOUT : Gestion de l'affichage de l'erreur ---
-            isError = isNomError,
-            supportingText = {
-                if (isNomError) {
-                    Text("Le nom ne peut pas être vide.")
+    // --- On utilise un Scaffold pour la structure de l'écran ---
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Modifier le contact") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Retour"
+                        )
+                    }
                 }
-            }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = telephone,
-            onValueChange = {
-                telephone = it
-                isTelephoneError = false // On enlève l'erreur dès que l'utilisateur tape
-            },
-            label = { Text("Numéro de téléphone") },
-            // --- AJOUT : Gestion de l'affichage de l'erreur ---
-            isError = isTelephoneError,
-            supportingText = {
-                if (isTelephoneError) {
-                    Text("Le numéro de téléphone est invalide.")
-                }
-            }
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = {
-            // --- AJOUT : Logique de validation ---
-            isNomError = nom.isBlank()
-            isTelephoneError = telephone.isBlank() || !telephone.all { it.isDigit() }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // --- Ajout d'une icône et du type de clavier ---
+            OutlinedTextField(
+                value = nom,
+                onValueChange = {
+                    nom = it
+                    isNomError = false
+                },
+                label = { Text("Nom") },
+                modifier = Modifier.fillMaxWidth(),
+                isError = isNomError,
+                leadingIcon = {
+                    Icon(Icons.Outlined.Person, contentDescription = "Nom")
+                },
+                supportingText = {
+                    if (isNomError) {
+                        Text("Le nom ne peut pas être vide.")
+                    }
+                },
+                singleLine = true
+            )
 
-            // Si aucune erreur n'est détectée, on met à jour le contact
-            if (!isNomError && !isTelephoneError) {
-                val updatedContact = contact.copy(nom = nom, numTelephone = telephone)
-                onUpdateContact(updatedContact)
+            // --- Ajout d'une icône et du type de clavier ---
+            OutlinedTextField(
+                value = telephone,
+                onValueChange = {
+                    telephone = it
+                    isTelephoneError = false
+                },
+                label = { Text("Numéro de téléphone") },
+                modifier = Modifier.fillMaxWidth(),
+                isError = isTelephoneError,
+                leadingIcon = {
+                    Icon(Icons.Outlined.Phone, contentDescription = "Téléphone")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                supportingText = {
+                    if (isTelephoneError) {
+                        Text("Le numéro de téléphone est invalide.")
+                    }
+                },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.weight(1f)) // Pousse le bouton vers le bas
+
+            Button(
+                onClick = {
+                    isNomError = nom.isBlank()
+                    isTelephoneError = telephone.isBlank() || !telephone.all { it.isDigit() }
+
+                    if (!isNomError && !isTelephoneError) {
+                        val updatedContact = contact.copy(nom = nom, numTelephone = telephone)
+                        onUpdateContact(updatedContact)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Modifier ce contact")
             }
-        }) {
-            Text("Modifier ce contact")
         }
     }
 }
